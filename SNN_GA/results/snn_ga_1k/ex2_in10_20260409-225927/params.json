@@ -1,0 +1,38 @@
+{
+  "ex_target": 2.0,
+  "in_target": 10.0,
+  "psd_peak_target": 50.0,
+  "max_error": 5.0,
+  "generations": 25,
+  "pop_size": 45,
+  "trials_per_candidate": 15,
+  "psd_mode": "isum",
+  "run_label": "ex2_in10",
+  "run_time_str": "20260409-225927",
+  "training_time_sec": 3129.65532207489,
+  "best_gen_validated": false,
+  "best_generation_by_l2": 25,
+  "best_candidate": {
+    "ge": 0.24300865240747455,
+    "gi": 1.8405192655714928,
+    "sparsity": 0.9198099170164012,
+    "thalamic_ex": 4.5679214008330655,
+    "thalamic_in": 4.826516643672233,
+    "composite": 0.5844899619403864
+  },
+  "final_bootstrap_n": 10,
+  "chosen_generation": 25,
+  "validation_params": {
+    "TOP_K": 3,
+    "N_REEVAL": 5,
+    "SMOOTH_WINDOW": 5,
+    "SUSTAIN_WINDOW": 3,
+    "STABLE_RUN": 5,
+    "REL_CHANGE_THRESH": 0.01
+  },
+  "best_gen_final": 25,
+  "best_candidate_final": {
+    "ge": 0.24300865240747455,
+    "gi": 1.8405192655714928
+  }
+}

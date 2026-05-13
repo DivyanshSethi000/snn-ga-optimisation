@@ -1,0 +1,35 @@
+{
+  "firing_rate_target": 0.09,
+  "psd_peak_target": 0.195,
+  "max_error": 0.3,
+  "generations": 25,
+  "pop_size": 50,
+  "trials_per_candidate": 1,
+  "psd_mode": "isum",
+  "run_label": "organoid",
+  "run_time_str": "20260407-151207",
+  "training_time_sec": 13299.13596367836,
+  "best_gen_validated": false,
+  "best_generation_by_l2": 2,
+  "best_candidate": {
+    "ge": 0.812163503194416,
+    "gi": 0.994076389772654,
+    "sparsity": 0.9961474399602477,
+    "composite": 0.10950946220885253
+  },
+  "final_bootstrap_n": 10,
+  "chosen_generation": 2,
+  "validation_params": {
+    "TOP_K": 3,
+    "N_REEVAL": 5,
+    "SMOOTH_WINDOW": 5,
+    "SUSTAIN_WINDOW": 3,
+    "STABLE_RUN": 5,
+    "REL_CHANGE_THRESH": 0.01
+  },
+  "best_gen_final": 2,
+  "best_candidate_final": {
+    "ge": 0.812163503194416,
+    "gi": 0.994076389772654
+  }
+}

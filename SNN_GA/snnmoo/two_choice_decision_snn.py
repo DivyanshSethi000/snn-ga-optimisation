@@ -15,13 +15,13 @@ class TwoChoiceDecisionSNN:
         I_stim=0.0,
         bias=0.0,
     ):
-        self.seed = seed
+        self.seed = seed # Store seed for reproducible connectivity + noise
 
         # Excitatory -> Excitatory synaptic strengths.
         # GA optimizes these once and uses them for both E1 and E2 within-population connections.
         self.wEE_A = wEE_A
         self.wEE_N = wEE_N
-
+        # Cross‑pool E→E connections disabled in this model
         self.wEE_A_cross = 0.0
         self.wEE_N_cross = 0.0
 
@@ -148,9 +148,7 @@ class TwoChoiceDecisionSNN:
         np.fill_diagonal(A, 0.0)
         W_GABA[np.ix_(self.idxI, self.idxI)] = self.wII_G * A
 
-        # ----------------------------------------------------
         # Recording structures
-        # ----------------------------------------------------
         # spikeTimes: list of spike times for each neuron.
         spikeTimes = [[] for _ in range(self.N)]
 
@@ -167,9 +165,8 @@ class TwoChoiceDecisionSNN:
         spikeRasterE2 = np.zeros((self.NE2, steps), dtype=bool)
         spikeRasterI  = np.zeros((self.NI,  steps), dtype=bool)
 
-        # ----------------------------------------------------
+
         # External drive parameters (background noise)
-        # ----------------------------------------------------
         # I0E, I0I: baseline mean input to E and I.
         # sigmaE, sigmaI: standard deviation of Gaussian noise per time step.
         I0E = 1.0
@@ -181,24 +178,19 @@ class TwoChoiceDecisionSNN:
         evidenceStart = 500
         evidenceEnd   = 1500
 
-        # ----------------------------------------------------
         # MAIN SIMULATION LOOP
-        # ----------------------------------------------------
         for t in range(steps):
             tm = time[t]
 
-            # -----------------------------
             # External current (background)
-            # -----------------------------
             # Each population receives Gaussian noise around its baseline.
             Iext = np.zeros(self.N)
             Iext[self.idxE1] = I0E + sigmaE * np.random.randn(self.NE1)
             Iext[self.idxE2] = I0E + sigmaE * np.random.randn(self.NE2)
             Iext[self.idxI]  = I0I + sigmaI * np.random.randn(self.NI)
 
-            # -----------------------------
+
             # Stimulus drive (evidence)
-            # -----------------------------
             # During the evidence window, both E1 and E2 receive additional
             # stimulus current. The bias parameter can tilt the stimulus
             # slightly towards one pool or the other.
@@ -206,9 +198,7 @@ class TwoChoiceDecisionSNN:
                 Iext[self.idxE1] += self.I_stim * (1 + self.bias)
                 Iext[self.idxE2] += self.I_stim * (1 - self.bias)
 
-            # -----------------------------
             # Synaptic currents
-            # -----------------------------
             # AMPA and NMDA are excitatory (reversal ~0 mV),
             # GABA is inhibitory (reversal ~ -70 mV).
             IAMP = gA * (0 - v)
@@ -221,9 +211,7 @@ class TwoChoiceDecisionSNN:
             # Record total synaptic current across the network.
             I_sum[t] = np.sum(Isyn)
 
-            # -----------------------------
             # Izhikevich neuron update
-            # -----------------------------
             # dv/dt = 0.04 v^2 + 5 v + 140 - u + I
             # du/dt = a (b v - u)
             I = Iext + Isyn
@@ -249,9 +237,7 @@ class TwoChoiceDecisionSNN:
             v[spiked] = c[spiked]
             u[spiked] = u[spiked] + d[spiked]
 
-            # -----------------------------
             # Synaptic conductance updates
-            # -----------------------------
             # First, exponential decay of existing conductances.
             gA *= decA
             gN *= decN
@@ -266,17 +252,13 @@ class TwoChoiceDecisionSNN:
                 gN += W_NMDA @ spk
                 gG += W_GABA @ spk
 
-            # -----------------------------
             # Population spike counts
-            # -----------------------------
             # Count how many neurons in each population spiked at this time step.
             spikeCountE1[t] = np.sum(spiked[self.idxE1])
             spikeCountE2[t] = np.sum(spiked[self.idxE2])
             spikeCountI[t]  = np.sum(spiked[self.idxI])
 
-        # ----------------------------------------------------
         # PSD COMPUTATION (500–1500 ms window)
-        # ----------------------------------------------------
         # We compute the PSD of I_sum in the decision window using:
         # - rFFT (real FFT)
         # - Hanning window
